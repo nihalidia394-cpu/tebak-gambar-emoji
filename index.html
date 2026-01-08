@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Tebak Gambar Emoji - Skor & Bintang</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eaeaea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 360px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .emoji {
+            font-size: 60px;
+            margin: 15px 0;
+        }
+
+        select, input, button {
+            width: 90%;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 16px;
+        }
+
+        .score {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .stars {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game">
+    <h2>Tebak Gambar Emoji</h2>
+
+    <select id="level" onchange="changeLevel()">
+        <option value="mudah">Level Mudah</option>
+        <option value="susah" disabled>🔒 Level Susah</option>
+    </select>
+
+    <div class="emoji" id="emoji"></div>
+
+    <input type="text" id="answer" placeholder="Jawaban kamu...">
+
+    <button onclick="checkAnswer()">Tebak</button>
+    <button onclick="nextQuestion()">Soal Berikutnya</button>
+
+    <div class="result" id="result"></div>
+    <div class="score">Skor: <span id="score">0</span></div>
+    <div class="stars" id="stars"></div>
+</div>
+
+<script>
+    const mudah = [
+        { emoji: "🐱", answer: "kucing" },
+        { emoji: "🐶", answer: "anjing" },
+        { emoji: "🍎", answer: "apel" },
+        { emoji: "🚗", answer: "mobil" }
+    ];
+
+    const susah = [
+        { emoji: "🌧️☔", answer: "hujan" },
+        { emoji: "🏫📚", answer: "sekolah" },
+        { emoji: "🌞🌻", answer: "musim panas" },
+        { emoji: "⚽🥅", answer: "sepak bola" }
+    ];
+
+    let questions = mudah;
+    let index = 0;
+    let score = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let easyCompleted = false;
+
+    function showQuestion() {
+        document.getElementById("emoji").textContent = questions[index].emoji;
+        document.getElementById("answer").value = "";
+        document.getElementById("result").textContent = "";
+    }
+
+    function checkAnswer() {
+        let userAnswer = document.getElementById("answer").value.toLowerCase();
+        let correctAnswer = questions[index].answer;
+
+        if (userAnswer === correctAnswer) {
+            document.getElementById("result").textContent = "✅ Benar!";
+            document.getElementById("result").style.color = "green";
+            score += 10;
+            correctCount++;
+        } else {
+            document.getElementById("result").textContent =
+                "❌ Salah! Jawaban: " + correctAnswer;
+            document.getElementById("result").style.color = "red";
+            wrongCount++;
+        }
+
+        document.getElementById("score").textContent = score;
+    }
+
+    function nextQuestion() {
+        index++;
+
+        if (index >= questions.length) {
+            showStars();
+
+            if (questions === mudah && !easyCompleted) {
+                easyCompleted = true;
+                unlockHardLevel();
+            }
+
+            alert("🎉 Level selesai!");
+            index = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            document.getElementById("stars").textContent = "";
+        }
+
+        showQuestion();
+    }
+
+    function showStars() {
+        let stars = "";
+
+        if (wrongCount === 0) {
+            stars = "⭐⭐⭐";
+        } else if (wrongCount === 1) {
+            stars = "⭐⭐";
+        } else {
+            stars = "⭐";
+        }
+
+        document.getElementById("stars").textContent =
+            "Bintang: " + stars;
+    }
+
+    function unlockHardLevel() {
+        let levelSelect = document.getElementById("level");
+        levelSelect.options[1].disabled = false;
+        levelSelect.options[1].text = "Level Susah";
+        alert("🔓 Level Susah terbuka!");
+    }
+
+    function changeLevel() {
+        let level = document.getElementById("level").value;
+        questions = level === "mudah" ? mudah : susah;
+        index = 0;
+        score = 0;
+        correctCount = 0;
+        wrongCount = 0;
+        document.getElementById("score").textContent = score;
+        document.getElementById("stars").textContent = "";
+        showQuestion();
+    }
+
+    showQuestion();
+</script>
+
+</body>
+</html>
